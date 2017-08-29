@@ -12,7 +12,7 @@ var privateRouter = require('./router/private.js').private;
 
 app.proxy = true
 
-//app.use(error(app))
+app.use(error(app))
 app.use(koaBody(
     {
       multipart: true,
