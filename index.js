@@ -44,6 +44,11 @@ root.get('/',function(ctx){
     ctx.body = "root called"
 })
 
+root.post('/save_user',require('./controller/user').saveUser);
+root.get('/get_user',require('./controller/user').getUsers);
+root.get('/get_user_by_id/:id',require('./controller/user').getUsersById);
+root.put('/update_user/:id',require('./controller/user').updateUsers);
+root.del('/delete_user/:id',require('./controller/user').deleteUser);
 
 
 var publicRouterCompose = compose([
