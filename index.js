@@ -11,6 +11,7 @@ var error = require('./middleware/error.js');
 var reqMid = require('./middleware/requestLog.js');
 var publicRouter = require('./router/public.js').public;
 var privateRouter = require('./router/private.js').private;
+var dbConnection = require('./db_connection');
 
 app.proxy = true
 
@@ -22,7 +23,9 @@ app.use(koaBody(
     }
   ));
 app.use(mount('/files',serve('./files')));
-  
+
+dbConnection.connect();
+
 app.use(reqMid)
 
 // app.use(async function(ctx){
