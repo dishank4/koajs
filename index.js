@@ -4,6 +4,8 @@ var Router = require('koa-router')
 var mount = require('koa-mount')
 var compose = require('koa-compose')
 var koaBody = require('koa-body')
+var serve = require('koa-static');
+
 
 var error = require('./middleware/error.js');
 var reqMid = require('./middleware/requestLog.js');
@@ -12,15 +14,17 @@ var privateRouter = require('./router/private.js').private;
 
 app.proxy = true
 
-//app.use(error(app))
+app.use(error(app))
 app.use(koaBody(
     {
       multipart: true,
       formidable: {}
     }
   ));
-
+app.use(mount('/files',serve('./files')));
+  
 app.use(reqMid)
+
 // app.use(async function(ctx){
 //     return new Promise(function(resolve,reject){
 //          setTimeout( function(){
