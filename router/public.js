@@ -3,10 +3,13 @@ var router = require('koa-router');
 //module.exports = function () {
     var public = new router();
 
-    public.get('/pub1', async function (ctx) {
-        ctx.body = "pub1 called";
-    })
+
+    public.post('/user',require('../controller/user').saveUser);
+    public.get('/users',require('../controller/user').getUsers);
+    public.get('/user/:id',require('../controller/user').getUsersById);
+    public.put('/user/:id',require('../controller/user').updateUsers);
+    public.del('/user/:id',require('../controller/user').deleteUser);
 
 //};
 
-module.exports.public = public;
+module.exports.pubRoute = public;

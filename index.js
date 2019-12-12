@@ -9,7 +9,7 @@ var serve = require('koa-static');
 
 var error = require('./middleware/error.js');
 var reqMid = require('./middleware/requestLog.js');
-var publicRouter = require('./router/public.js').public;
+var publicRouter = require('./router/public.js').pubRoute;
 var privateRouter = require('./router/private.js').private;
 var dbConnection = require('./db_connection');
 
@@ -26,31 +26,7 @@ app.use(mount('/files',serve('./files')));
 
 dbConnection.connect();
 
-app.use(reqMid)
-
-// app.use(async function(ctx){
-//     return new Promise(function(resolve,reject){
-//          setTimeout( function(){
-//             console.log('middleware called');
-//             //ctx.body = 'Hello world!';
-            
-//             resolve();
-//         },2000)
-//     })
-// });
-
-var root = new Router()
-root.get('/',function(ctx){
-    ctx.body = "root called"
-})
-
-root.post('/save_user',require('./controller/user').saveUser);
-root.get('/get_user',require('./controller/user').getUsers);
-root.get('/get_user_by_id/:id',require('./controller/user').getUsersById);
-root.put('/update_user/:id',require('./controller/user').updateUsers);
-root.del('/delete_user/:id',require('./controller/user').deleteUser);
-
-
+app.use(reqMid);
 var publicRouterCompose = compose([
     publicRouter.routes(),
     publicRouter.allowedMethods()
@@ -61,8 +37,15 @@ var privateRouterCompose = compose ([
     privateRouter.allowedMethods()
 ])
 
-app.use(compose([root.routes(),root.allowedMethods(),mount('/pub',publicRouterCompose),mount('/pri',privateRouterCompose)]));
-app.use(function(ctx){ctx.throw('no such route found',404)})
+app.use(
+  compose(
+    [
+      mount('/pub',publicRouterCompose),
+      mount('/pri',privateRouterCompose)
+    ]
+  )
+);
+//app.use(function(ctx){ctx.throw('no such route found',404)})
 
 
 

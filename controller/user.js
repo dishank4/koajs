@@ -1,21 +1,23 @@
 var UsersModel = require('../model/').Users;
 
-exports.saveUser = async function(ctx){
+exports.saveUser = async function saveUser(ctx){
     var post = ctx.request.body;
 
-    if(!post.name){
+    if(!post.userName || post.firstName || post.email || post.password){
         ctx.throw('Invalid request',400)
     }
     user = new UsersModel();
     //user = post;
-    user.name = post.name;
-    user.phoneNo = post.phoneNo; 
-    var user = await user.save()
-    if(!user){
+    user.userName = post.userName;
+    user.firstName = post.firstName; 
+    user.email = post.email; 
+    user.password = post.password; 
+    var userObj = await user.save()
+    if(!userObj){
         ctx.throw('Something went wrong while saveing user!!');
     }
     
-    ctx.body = user;
+    ctx.body = userObj;
 
     console.log('this code is also executed..!!');
 }
@@ -43,10 +45,9 @@ exports.updateUsers = async function(ctx){
     if(!user){
         ctx.throw('No such user found in db',404)
     }
-
-    user.name = post.name;
-    user.phoneNo = post.phoneNo;
-
+    
+    user.userName = post.userName ? post.userName : user.name;
+    user.phoneNo = post.email;
     var updateUser = await user.save();
 
     if(!updateUser){

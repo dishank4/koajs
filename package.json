@@ -18,6 +18,7 @@
   "homepage": "https://github.com/dishank4/koajs#readme",
   "dependencies": {
     "koa": "^2.3.0",
+    "koa-body": "^4.1.1",
     "koa-compose": "^4.0.0",
     "koa-mount": "^3.0.0",
     "koa-router": "^7.2.1",

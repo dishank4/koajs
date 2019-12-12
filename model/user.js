@@ -1,11 +1,13 @@
 var mongoose = require('mongoose')
-, Types = require('mongoose').Types
-, SchemaTypes = require('mongoose').SchemaTypes
-, Schema = require('mongoose').Schema
+, Types = mongoose.Types
+, SchemaTypes = mongoose.SchemaTypes
+, Schema = mongoose.Schema
 
 
 var userSchema = module.exports = Schema({
-name          : { type: String, required: true },
-phoneNo       : {type :Number }    
+userName    : { type: String, required: true ,  index : true , unique : true },
+firstName   : { type: String, required: true },
+email       : { type: String, required: true },
+password    : { type: String, required: true },
 })
 
