@@ -1,9 +1,11 @@
 var UsersModel = require('../model/').Users;
+var crypto = require('crypto');
+const jwt = require('../utility/jwt');
 
 exports.saveUser = async function saveUser(ctx){
     var post = ctx.request.body;
 
-    if(!post.userName || post.firstName || post.email || post.password){
+    if(!(post.userName || post.firstName || post.email || post.password)){
         ctx.throw('Invalid request',400)
     }
     user = new UsersModel();
@@ -11,15 +13,16 @@ exports.saveUser = async function saveUser(ctx){
     user.userName = post.userName;
     user.firstName = post.firstName; 
     user.email = post.email; 
-    user.password = post.password; 
-    var userObj = await user.save()
+    user.setPassword(post.password); 
+    var userObj = await user.save();
     if(!userObj){
         ctx.throw('Something went wrong while saveing user!!');
     }
+    delete userObj._doc.hash;
     
-    ctx.body = userObj;
+    delete userObj._doc.salt;
 
-    console.log('this code is also executed..!!');
+    ctx.body = userObj._doc;
 }
 
 exports.getUsers = async function(ctx){
@@ -66,6 +69,24 @@ exports.deleteUser = async function(ctx){
     }
 
    ctx.body = await user.remove();
+}
+
+exports.login = async function(ctx){
+    var post = ctx.request.body;
+    var user = await UsersModel.findOne({userName : post.userName }).exec();
+    if(!user){
+        ctx.throw("Invalid credentials",401);
+    }
+    var passwordCheck = await user.validPassword(post.password);
+    if(!passwordCheck){
+        ctx.throw("Invalid credentials",401);
+    }
+    
+    delete user._doc.hash;
+    delete user._doc.salt;
+    
+    user._doc['token'] = await jwt.generateToken({"_id":user._id.toString() , "userName":user.userName , "email":user.email});
+    ctx.body = user._doc;
 }
 
 async function checkUserExist(id){

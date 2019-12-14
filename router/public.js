@@ -9,7 +9,7 @@ var router = require('koa-router');
     public.get('/user/:id',require('../controller/user').getUsersById);
     public.put('/user/:id',require('../controller/user').updateUsers);
     public.del('/user/:id',require('../controller/user').deleteUser);
-
+    public.post('/login',require('../controller/user').login);
 //};
 
 module.exports.pubRoute = public;

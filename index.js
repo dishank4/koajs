@@ -12,7 +12,7 @@ var reqMid = require('./middleware/requestLog.js');
 var publicRouter = require('./router/public.js').pubRoute;
 var privateRouter = require('./router/private.js').private;
 var dbConnection = require('./db_connection');
-
+var authMiddlewate = require('./middleware/auth');
 app.proxy = true
 
 app.use(error(app))
@@ -37,14 +37,9 @@ var privateRouterCompose = compose ([
     privateRouter.allowedMethods()
 ])
 
-app.use(
-  compose(
-    [
-      mount('/pub',publicRouterCompose),
-      mount('/pri',privateRouterCompose)
-    ]
-  )
-);
+app.use(mount('/pub',publicRouterCompose))
+app.use(authMiddlewate)
+app.use(mount('/pri',privateRouterCompose))
 //app.use(function(ctx){ctx.throw('no such route found',404)})
 
 

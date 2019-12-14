@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/dishank4/koajs#readme",
   "dependencies": {
+    "bcrypt": "^3.0.7",
     "koa": "^2.3.0",
     "koa-body": "^4.1.1",
     "koa-compose": "^4.0.0",
