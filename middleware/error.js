@@ -17,7 +17,8 @@ module.exports = function (app) {
           success: false,
           url: ctx.url,
           method: ctx.method,
-          error: ctx.err.message,
+          message: ctx.err.message,
+          code: ctx.err.status,
           errors: ctx.errors && Object.keys(err.errors).map(function (key) {
             return key + ': ' + err.errors[key].message
           })

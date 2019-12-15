@@ -9,7 +9,7 @@ var cors = require('koa2-cors');
 
 
 var error = require('./middleware/error.js');
-var reqMid = require('./middleware/requestLog.js');
+var requestLogTime = require('./middleware/requestLog.js');
 var publicRouter = require('./router/public.js').pubRoute;
 var privateRouter = require('./router/private.js').private;
 var dbConnection = require('./db_connection');
@@ -38,7 +38,8 @@ app.use(mount('/files',serve('./files')));
 
 dbConnection.connect();
 
-app.use(reqMid);
+app.use(requestLogTime);
+
 var publicRouterCompose = compose([
     publicRouter.routes(),
     publicRouter.allowedMethods()
