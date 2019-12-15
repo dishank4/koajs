@@ -5,6 +5,7 @@ var mount = require('koa-mount')
 var compose = require('koa-compose')
 var koaBody = require('koa-body')
 var serve = require('koa-static');
+var cors = require('koa2-cors');
 
 
 var error = require('./middleware/error.js');
@@ -15,7 +16,18 @@ var dbConnection = require('./db_connection');
 var authMiddlewate = require('./middleware/auth');
 app.proxy = true
 
-app.use(error(app))
+app.use(error(app));
+app.use(cors(
+{
+  origin: function(ctx) {
+    return '*';
+  },
+  exposeHeaders: ['WWW-Authenticate', 'Server-Authorization'],
+  maxAge: 5,
+  credentials: true,
+  allowMethods: ['GET', 'POST', 'DELETE','OPTIONS'],
+  allowHeaders: ['Content-Type', 'Authorization', 'Accept'],
+}));
 app.use(koaBody(
     {
       multipart: true,
@@ -40,11 +52,12 @@ var privateRouterCompose = compose ([
 app.use(mount('/pub',publicRouterCompose))
 app.use(authMiddlewate)
 app.use(mount('/pri',privateRouterCompose))
+
 //app.use(function(ctx){ctx.throw('no such route found',404)})
 
 
 
 
 app.listen(3000, function(){
-    console.log('Server running on https://localhost:3000')
+    console.log('Server running on http://localhost:3000')
 })

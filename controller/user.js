@@ -21,8 +21,11 @@ exports.saveUser = async function saveUser(ctx){
     delete userObj._doc.hash;
     
     delete userObj._doc.salt;
-
-    ctx.body = userObj._doc;
+    const res = new Object();
+    res.data = resuserObj._doc;
+    res.error = '';
+    res.success = true;
+    ctx.body = res;
 }
 
 exports.getUsers = async function(ctx){
@@ -86,7 +89,11 @@ exports.login = async function(ctx){
     delete user._doc.salt;
     
     user._doc['token'] = await jwt.generateToken({"_id":user._id.toString() , "userName":user.userName , "email":user.email});
-    ctx.body = user._doc;
+    const res = new Object();
+    res.data = user._doc;
+    res.error = '';
+    res.success = true;
+    ctx.body = res;
 }
 
 async function checkUserExist(id){

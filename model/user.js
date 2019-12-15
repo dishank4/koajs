@@ -38,3 +38,5 @@ userSchema.methods.ToJsonRes = function(){
     delete this.salt;
     return this;
 }
+
+
