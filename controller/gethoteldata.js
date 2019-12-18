@@ -1,5 +1,5 @@
 var requestPromise = require('request-promise');
-
+var apiCall = require('../utility/apiCall');
 // {
 // 	"body":{"name":"1,brij,shah,adult",
 // 		"card_cvc":"123",
@@ -51,43 +51,63 @@ exports.getHotelsData = async function(ctx){
         URL = `https://api-test.hotelspro.com/api/v2/search/?checkin=${checkIn}&checkout=${checkOut}&pax=${pax}&client_nationality=${client_nationality}&currency=${currency}&lat=${lat}&lon=${lon}&radius=${radius}`;
     }
 
-
     options_search = {
         method:'GET',
         uri: URL,
         headers: {
-            'Authorization': post.authorization
+            'Authorization': post.authorization,
+            'Content-Type':'application/json'
         },
         json: true 
     };
 
-    var result_search = await requestPromise(options_search);
+    var result_search = await apiCall.get(options_search.uri , options_search.headers);
+    result_search = JSON.parse(result_search);
+   
+//////////  Availibility ////////////////
 
+URL = `https://api-test.hotelspro.com/api/v2/hotel-availability/?search_code=${result_search.code}&hotel_code=${result_search.results[0].hotel_code}&max_product=3`
+
+options_avail = {
+    method:'GET',
+    uri: URL,
+    headers: {
+        'Authorization': post.authorization,
+        'Content-Type':'application/json'
+    },
+    json: true 
+};
+
+var result_availibility_search = await apiCall.get(options_avail.uri , options_avail.headers);
+result_availibility_search = JSON.parse(result_availibility_search);
 //////////  Provision ////////////////
-
     var Hotel = result_search.results[0]; 
     var Product = Hotel.products[0];
     var ProductCode = Product.code;
 
-    URL = `https://api-test.hotelspro.com/api/v2/provision/${ProductCode}`
+    const pcode = result_availibility_search.results[0].code
+   
+
+    URL = `https://api-test.hotelspro.com/api/v2/provision/${pcode}`;//`https://api-test.hotelspro.com/api/v2/provision/${ProductCode}`
 
     options_Provision = {
         method:'POST',
         uri: URL,
         headers: {
-            'Authorization': post.authorization
+            'Authorization': post.authorization,
+            'Content-Type':'application/json'
         },
         json: true 
     };
 
-    var result_Provision = await requestPromise(options_Provision);
-
+    var result_Provision = await apiCall.post(options_Provision.uri , options_Provision.headers);
+    result_Provision = JSON.parse(result_Provision);
 //////////  Booking ////////////////
 
-    var Provision_code = result_Provision.code;
+var Provision_code = result_Provision.code;
     var expected_Price = result_Provision.price;
 
-    post.body["expected_Price"] = expected_Price;
+    post.body["expected_price"] = expected_Price;
 
     URL = `https://api-test.hotelspro.com/api/v2/book/${Provision_code}`
 
@@ -95,14 +115,15 @@ exports.getHotelsData = async function(ctx){
         method:'POST',
         uri: URL,
         headers: {
-            'Authorization': post.authorization
+            'Authorization': post.authorization,
+            'Content-Type':'application/x-www-form-urlencoded'
         },
         body:post.body,
         json: true 
     }; 
 
-    var result_Book = await requestPromise(options_Book);
-
+    var result_Book = await apiCall.post(options_Book.uri , options_Book.headers, null,post.body);
+    result_Book = JSON.parse(result_Book);
     SuccessResult(ctx,'Get Data Successfully...',200,result_Book)
 }
 

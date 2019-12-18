@@ -1,7 +1,7 @@
 module.exports = function (app) {
     return async function error(ctx , next) {
       try {
-        await next()
+        await next();
       } catch (err) {
         if ('ValidationError' === err.name) err.status = 400
         if ('CastError' === err.name) err.status = 404

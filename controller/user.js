@@ -34,7 +34,7 @@ exports.saveUser = async function saveUser(ctx){
 
 exports.getUsers = async function(ctx){
     var result = await UsersModel.find().exec();
-    SuccessResult(ctx,'User Get Successfully...',200,result)
+    SuccessResult(ctx,'User Get Successfully...',200,result);
 }
 
 exports.getUsersById = async function(ctx){

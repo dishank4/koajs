@@ -57,7 +57,7 @@ var serviceHotelsCompose = compose([
 ])
 
 app.use(mount('/pub',publicRouterCompose))
-// app.use(authMiddlewate)
+app.use(authMiddlewate)
 app.use(mount('/hot',serviceHotelsCompose))
 app.use(mount('/pri',privateRouterCompose))
 

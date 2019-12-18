@@ -45,8 +45,8 @@ exports.serviceCall = async function(ctx){
         default: ctx.throw(406, 'Invalid Method...');
     }
 
-    ctx.body = result = await requestPromise(options);
-    // SuccessResult(ctx,'Get Data Successfully...',200,result)
+    var result = await requestPromise(options);
+     SuccessResult(ctx,'Get Data Successfully...',200,result)
 }
 
 function SuccessResult(ctx, msg, code, data){
