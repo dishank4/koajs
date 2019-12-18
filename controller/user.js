@@ -1,6 +1,7 @@
 var UsersModel = require('../model/').Users;
 var crypto = require('crypto');
 const jwt = require('../utility/jwt');
+var rp = require('request-promise');
 
 exports.saveUser = async function saveUser(ctx){
     var post = ctx.request.body;
@@ -103,6 +104,19 @@ exports.login = async function(ctx){
     user._doc['token'] = await jwt.generateToken({"_id":user._id.toString() , "userName":user.userName , "email":user.email});
 
     SuccessResult(ctx,'User Login Successfully...',200,user._doc)
+}
+
+exports.getBookings = async function(ctx){
+    var options = {
+        uri: 'https://api-test.hotelspro.com/api/v2/bookings/?&from_date=2019-02-01&to_date=2020-02-01',
+        headers: {
+            'Authorization': 'Basic VmliZVhUR1Rlc3Q6NUxBZVg3UllLbmFGc3dqeg=='
+        },
+        json: true // Automatically parses the JSON string in the response
+    };
+
+    var result = await rp(options);
+    SuccessResult(ctx,'Get Bookings Data Successfully...',200,result)
 }
 
 async function checkUserExist(id){

@@ -12,6 +12,7 @@ var error = require('./middleware/error.js');
 var requestLogTime = require('./middleware/requestLog.js');
 var publicRouter = require('./router/public.js').pubRoute;
 var privateRouter = require('./router/private.js').private;
+var ServiceHotelsRouter = require('./router/service_hotels').serviceHotels;
 var dbConnection = require('./db_connection');
 var authMiddlewate = require('./middleware/auth');
 app.proxy = true
@@ -50,8 +51,14 @@ var privateRouterCompose = compose ([
     privateRouter.allowedMethods()
 ])
 
+var serviceHotelsCompose = compose([
+  ServiceHotelsRouter.routes(),
+  ServiceHotelsRouter.allowedMethods()
+])
+
 app.use(mount('/pub',publicRouterCompose))
-app.use(authMiddlewate)
+// app.use(authMiddlewate)
+app.use(mount('/hot',serviceHotelsCompose))
 app.use(mount('/pri',privateRouterCompose))
 
 //app.use(function(ctx){ctx.throw('no such route found',404)})
