@@ -106,19 +106,6 @@ exports.login = async function(ctx){
     SuccessResult(ctx,'User Login Successfully...',200,user._doc)
 }
 
-exports.getBookings = async function(ctx){
-    var options = {
-        uri: 'https://api-test.hotelspro.com/api/v2/bookings/?&from_date=2019-02-01&to_date=2020-02-01',
-        headers: {
-            'Authorization': 'Basic VmliZVhUR1Rlc3Q6NUxBZVg3UllLbmFGc3dqeg=='
-        },
-        json: true // Automatically parses the JSON string in the response
-    };
-
-    var result = await rp(options);
-    SuccessResult(ctx,'Get Bookings Data Successfully...',200,result)
-}
-
 async function checkUserExist(id){
     var user = await UsersModel.findOne({"_id":id}).exec();
     return user;

@@ -10,7 +10,6 @@ var router = require('koa-router');
     public.put('/user/:id',require('../controller/user').updateUsers);
     public.del('/user/:id',require('../controller/user').deleteUser);
     public.post('/login',require('../controller/user').login);
-    public.get('/getBookings',require('../controller/user').getBookings);
 //};
 
 module.exports.pubRoute = public;

@@ -1,5 +1,7 @@
 var requestPromise = require('request-promise');
 var apiCall = require('../utility/apiCall');
+var appconstant = require('../utility/const').constant;
+
 // {
 // 	"body":{"name":"1,brij,shah,adult",
 // 		"card_cvc":"123",
@@ -10,121 +12,133 @@ var apiCall = require('../utility/apiCall');
 // 		"email":"shahbrij@gmail.com",
 // 		"phone_number":"+919426144846"
 // 	},
-// 	"authorization":"Basic VmliZVhUR1Rlc3Q6NUxBZVg3UllLbmFGc3dqeg==",
+	// "header":{
+    // "Authorization": "Basic VmliZVhUR1Rlc3Q6NUxBZVg3UllLbmFGc3dqeg==",
+    // "Content-Type":"application/json" // 'application/x-www-form-urlencoded'
+    // },
 // 	"checkin":"2019-12-21",
 // 	"checkout":"2019-12-22",
-// 	"pax":"2",
+// 	"pax":"1",
 // 	"client_nationality":"es",
 // 	"currency":"usd",
 // 	"hotel_code":"14209a",
 // 	"destination_code":"11260",
 // 	"lat":"23.0225",
 // 	"lon":"72.5714",
-// 	"radius":"10000"
+// 	"radius":"10000",
+//  "from_date":"2019-02-01",
+//  "to_date":"2020-02-01"
 // }
+
+var searchHotelData = async function(URL, header){
+
+    var result_search = await apiCall.get(URL, header);
+    return result_search = JSON.parse(result_search);
+}
+
+var availabelHotel = async function(URL, header){
+
+    var result_availibility_search = await apiCall.get(URL , header);
+    return result_availibility_search = JSON.parse(result_availibility_search);    
+}
+
+var provisionHotel = async function(URL, header){
+
+    var result_Provision = await apiCall.post(URL , header);
+    return result_Provision = JSON.parse(result_Provision);    
+}
+
+var bookHotel = async function(URL, header, body){
+    
+    var result_Book = await apiCall.post(URL , header, null, body);
+    return result_Book = JSON.parse(result_Book);
+}
+
+var getBookings = async function(URL, header){
+    
+    var result_Bookings = await apiCall.get(URL , header);;
+    return result_Bookings = JSON.parse(result_Bookings);
+}
+
+function ThrowFunction(message){
+    ctx.thtow(404,message)
+    return;
+}
 
 exports.getHotelsData = async function(ctx){
 
-    var post = ctx.request.body;
+    var post = new Object();
+    post = ctx.request.body;
 
-    var checkIn = post.checkin;
-    var checkOut = post.checkout;
-    var pax = post.pax;
-    var client_nationality = post.client_nationality;
-    var currency = post.currency;
-    var hotel_code = post.hotel_code;
-    var destination_code = post.destination_code;
+    const key_checkin = Object.keys(post).find(k=>post[k]===post.checkin);
+    const key_checkout = Object.keys(post).find(k=>post[k]===post.checkout);
+    const key_pax = Object.keys(post).find(k=>post[k]===post.pax);
+    const key_client_nationality = Object.keys(post).find(k=>post[k]===post.client_nationality);
+    const key_currency = Object.keys(post).find(k=>post[k]===post.currency);
 
-    var lat = post.lat;
-    var lon = post.lon;
-    var radius = post.radius;
+    const key_hotel_code = Object.keys(post).find(k=>post[k]===post.hotel_code);
+    const key_destination_code = Object.keys(post).find(k=>post[k]===post.destination_code);
+    const key_lat = Object.keys(post).find(k=>post[k]===post.lat);
+    const key_lon = Object.keys(post).find(k=>post[k]===post.lon);
+    const key_radius = Object.keys(post).find(k=>post[k]===post.radius);
 
     var URL;
-    if(hotel_code){
-    
-        URL = `https://api-test.hotelspro.com/api/v2/search/?checkin=${checkIn}&checkout=${checkOut}&pax=${pax}&client_nationality=${client_nationality}&currency=${currency}&hotel_code=${hotel_code}`;
+    if(post.hotel_code){
+        URL = `${appconstant.ApiBaseURL}${appconstant.Api_URL_Search}${key_checkin}=${post.checkin}&${key_checkout}=${post.checkout}&${key_pax}=${post.pax}&${key_client_nationality}=${post.client_nationality}&${key_currency}=${post.currency}&${key_hotel_code}=${post.hotel_code}`;
     }
-    else if(destination_code){
-        URL = `https://api-test.hotelspro.com/api/v2/search/?checkin=${checkIn}&checkout=${checkOut}&pax=${pax}&client_nationality=${client_nationality}&currency=${currency}&destination_code=${destination_code}`;
+    else if(post.destination_code){
+        URL = `${appconstant.ApiBaseURL}${appconstant.Api_URL_Search}${key_checkin}=${post.checkIn}&${key_checkout}=${post.checkout}&${key_pax}=${post.pax}&${key_client_nationality}=${post.client_nationality}&${key_currency}=${post.currency}&${key_destination_code}=${post.destination_code}`;
     }
     else{
-        URL = `https://api-test.hotelspro.com/api/v2/search/?checkin=${checkIn}&checkout=${checkOut}&pax=${pax}&client_nationality=${client_nationality}&currency=${currency}&lat=${lat}&lon=${lon}&radius=${radius}`;
+        URL = `${appconstant.ApiBaseURL}${appconstant.Api_URL_Search}${key_checkin}=${post.checkIn}&${key_checkout}=${post.checkout}&${key_pax}=${post.pax}&${key_client_nationality}=${post.client_nationality}&${key_currency}=${post.currency}&${key_lat}=${post.lat}&${key_lon}=${post.lon}&${key_radius}=${post.radius}`;
     }
 
-    options_search = {
-        method:'GET',
-        uri: URL,
-        headers: {
-            'Authorization': post.authorization,
-            'Content-Type':'application/json'
-        },
-        json: true 
-    };
-
-    var result_search = await apiCall.get(options_search.uri , options_search.headers);
-    result_search = JSON.parse(result_search);
+    result_search = await searchHotelData(URL,post.header);
    
-//////////  Availibility ////////////////
+    if(!result_search){
+        ThrowFunction(appconstant.Records_Not_Found)
+    }
 
-URL = `https://api-test.hotelspro.com/api/v2/hotel-availability/?search_code=${result_search.code}&hotel_code=${result_search.results[0].hotel_code}&max_product=3`
+    //////////  Availibility ////////////////
+    URL = `${appconstant.ApiBaseURL}${appconstant.Api_URL_Availability}${appconstant.Api_URL_Availability_searchcode}=${result_search.code}&${key_hotel_code}=${result_search.results[0].hotel_code}&${appconstant.Api_URL_Availability_Max_product}`
+    result_availibility_search = await availabelHotel(URL,post.header);
 
-options_avail = {
-    method:'GET',
-    uri: URL,
-    headers: {
-        'Authorization': post.authorization,
-        'Content-Type':'application/json'
-    },
-    json: true 
-};
+    if(!result_availibility_search){
+        ThrowFunction(appconstant.Hotel_Not_Availabel)
+    }
 
-var result_availibility_search = await apiCall.get(options_avail.uri , options_avail.headers);
-result_availibility_search = JSON.parse(result_availibility_search);
-//////////  Provision ////////////////
-    var Hotel = result_search.results[0]; 
-    var Product = Hotel.products[0];
-    var ProductCode = Product.code;
-
+    //////////  Provision ////////////////
     const pcode = result_availibility_search.results[0].code
    
+    URL = `${appconstant.ApiBaseURL}${appconstant.Api_URL_Provision}${pcode}`;
+    result_Provision = await provisionHotel(URL, post.header);
 
-    URL = `https://api-test.hotelspro.com/api/v2/provision/${pcode}`;//`https://api-test.hotelspro.com/api/v2/provision/${ProductCode}`
+    if(!result_Provision){
+        ThrowFunction(appconstant.Provision_Fail)
+    }
 
-    options_Provision = {
-        method:'POST',
-        uri: URL,
-        headers: {
-            'Authorization': post.authorization,
-            'Content-Type':'application/json'
-        },
-        json: true 
-    };
-
-    var result_Provision = await apiCall.post(options_Provision.uri , options_Provision.headers);
-    result_Provision = JSON.parse(result_Provision);
-//////////  Booking ////////////////
-
-var Provision_code = result_Provision.code;
+    //////////  Booking ////////////////
+    var Provision_code = result_Provision.code;
     var expected_Price = result_Provision.price;
 
-    post.body["expected_price"] = expected_Price;
+    post.body[appconstant.Api_URL_Book_expected_price] = expected_Price;
 
-    URL = `https://api-test.hotelspro.com/api/v2/book/${Provision_code}`
+    URL = `${appconstant.ApiBaseURL}${appconstant.Api_URL_Book}${Provision_code}`
+    result_Book = await bookHotel(URL,post.header,post.body);
 
-    options_Book = {
-        method:'POST',
-        uri: URL,
-        headers: {
-            'Authorization': post.authorization,
-            'Content-Type':'application/x-www-form-urlencoded'
-        },
-        body:post.body,
-        json: true 
-    }; 
+    if(!result_Book){
+        ThrowFunction(appconstant.Booking_Fail);
+    }
+    
+    //////////  Booking Listing ////////////////
 
-    var result_Book = await apiCall.post(options_Book.uri , options_Book.headers, null,post.body);
-    result_Book = JSON.parse(result_Book);
-    SuccessResult(ctx,'Get Data Successfully...',200,result_Book)
+    const key_from_date = Object.keys(post).find(k=>post[k]===post.from_date);
+    const key_to_date = Object.keys(post).find(k=>post[k]===post.to_date);
+
+    URL = `${appconstant.ApiBaseURL}${appconstant.Api_URL_Bookings}&${key_from_date}=${post.from_date}&${key_to_date}=${post.to_date}`;
+    result_Bookings = await getBookings(URL, post.header)
+
+    SuccessResult(ctx,appconstant.Success_Data ,200,result_Bookings)
 }
 
 function SuccessResult(ctx, msg, code, data){
