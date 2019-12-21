@@ -1,0 +1,33 @@
+{
+  "name": "index.js",
+  "version": "1.0.0",
+  "description": "hello world!! - for this you need to do following things      1. npm init for setup the project error handling middleware router static files mongoose connection schema design crud apis",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/dishank4/koajs.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/dishank4/koajs/issues"
+  },
+  "homepage": "https://github.com/dishank4/koajs#readme",
+  "dependencies": {
+    "bcrypt": "^3.0.7",
+    "jsonwebtoken": "^8.5.1",
+    "koa": "^2.3.0",
+    "koa-body": "^4.1.1",
+    "koa-compose": "^4.0.0",
+    "koa-mount": "^3.0.0",
+    "koa-router": "^7.2.1",
+    "koa-static": "^4.0.1",
+    "koa2-cors": "^2.0.6",
+    "mongoose": "^4.11.9",
+    "request": "^2.88.0",
+    "request-promise": "^4.2.5"
+  }
+}
