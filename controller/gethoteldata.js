@@ -151,3 +151,43 @@ function SuccessResult(ctx, msg, code, data){
 
     ctx.body = result;
 }
+
+exports.getHotelListings = async function(ctx){
+
+    var fromDate = ctx.request.query.from_date;
+    var toDate = ctx.request.query.to_date;
+
+    var result_Listing = await getBookingListing(fromDate, toDate);
+    if(!result_Listing || !result_Listing.length){
+        SuccessResult(ctx, appconstant.Success_Fail, 200,result_Listing);
+    }else{
+        SuccessResult(ctx, appconstant.Success_Data , 200,result_Listing);
+    }
+        
+    
+}
+
+var getBookingListing = async function(fromDate, toDate){
+    
+    var URL;
+    var key_from_date = 'from_date';
+    var key_to_date = 'to_date';
+    if(fromDate && toDate){
+        URL = `${appconstant.ApiBaseURL}${appconstant.Api_URL_Bookings}&${key_from_date}=${fromDate}&${key_to_date}=${toDate}`;
+    }
+    else if(fromDate && !toDate){
+        URL = `${appconstant.ApiBaseURL}${appconstant.Api_URL_Bookings}&${key_from_date}=${fromDate}`;
+    }
+    else if(!fromDate && toDate){
+        URL = `${appconstant.ApiBaseURL}${appconstant.Api_URL_Bookings}&${key_to_date}=${toDate}`;
+    }
+    else{
+        var today = new Date();
+        var toDayDate = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+        URL = `${appconstant.ApiBaseURL}${appconstant.Api_URL_Bookings}&${key_from_date}=${toDayDate}`;
+    }
+
+    var authorization = appconstant.HotelPro;
+    var result_BookingListing = await apiCall.get(URL , null, authorization);;
+    return result_BookingListing = JSON.parse(result_BookingListing);
+}
