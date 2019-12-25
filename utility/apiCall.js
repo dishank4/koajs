@@ -1,11 +1,12 @@
  var requestPromise = require('request-promise');
  var apiMethods = require('./const').constant.ApiMethod;
 
-exports.get = async function(url,headers){
+exports.get = async function(url,headers,authorization = null){
     const options = {
             method:apiMethods.GET,
             uri: url,
-            headers: headers
+            headers: headers,
+            auth: authorization
         };
     return await callApi(options);
 }

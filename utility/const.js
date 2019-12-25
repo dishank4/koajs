@@ -1,5 +1,9 @@
 exports.constant = {
     JWK_KEY: '$2b$14$PuFDglFMU91U2LrUEKs.3e',
+    HotelPro:{
+        username:'VibeXTGTest',
+        password:'5LAeX7RYKnaFswjz',
+    },
     ApiMethod : {
         GET: 'GET',
         POST: 'POST',
@@ -18,6 +22,7 @@ exports.constant = {
 
 
     Success_Data: 'Get Data Successfully...',
+    Success_Fail: 'Can not get Data...',
     Booking_Fail: 'Booking can not done...',
     Provision_Fail: 'provision can not done...',
     Hotel_Not_Availabel: 'Hotel could not availabel...',
