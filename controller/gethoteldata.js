@@ -1,6 +1,7 @@
 var requestPromise = require('request-promise');
 var apiCall = require('../utility/apiCall');
 var appconstant = require('../utility/const').constant;
+var moment = require('moment');
 
 // {
 // 	"body":{"name":"1,brij,shah,adult",
@@ -70,27 +71,15 @@ exports.getHotelsData = async function(ctx){
     var post = new Object();
     post = ctx.request.body;
 
-    const key_checkin = Object.keys(post).find(k=>post[k]===post.checkin);
-    const key_checkout = Object.keys(post).find(k=>post[k]===post.checkout);
-    const key_pax = Object.keys(post).find(k=>post[k]===post.pax);
-    const key_client_nationality = Object.keys(post).find(k=>post[k]===post.client_nationality);
-    const key_currency = Object.keys(post).find(k=>post[k]===post.currency);
-
-    const key_hotel_code = Object.keys(post).find(k=>post[k]===post.hotel_code);
-    const key_destination_code = Object.keys(post).find(k=>post[k]===post.destination_code);
-    const key_lat = Object.keys(post).find(k=>post[k]===post.lat);
-    const key_lon = Object.keys(post).find(k=>post[k]===post.lon);
-    const key_radius = Object.keys(post).find(k=>post[k]===post.radius);
-
     var URL;
     if(post.hotel_code){
-        URL = `${appconstant.ApiBaseURL}${appconstant.Api_URL_Search}${key_checkin}=${post.checkin}&${key_checkout}=${post.checkout}&${key_pax}=${post.pax}&${key_client_nationality}=${post.client_nationality}&${key_currency}=${post.currency}&${key_hotel_code}=${post.hotel_code}`;
+        URL = `${appconstant.ApiBaseURL}${appconstant.Api_URL_Search}${appconstant.key_checkin}=${post.checkin}&${appconstant.key_checkout}=${post.checkout}&${appconstant.key_pax}=${post.pax}&${appconstant.key_client_nationality}=${post.client_nationality}&${appconstant.key_currency}=${post.currency}&${appconstant.key_hotel_code}=${post.hotel_code}`;
     }
     else if(post.destination_code){
-        URL = `${appconstant.ApiBaseURL}${appconstant.Api_URL_Search}${key_checkin}=${post.checkIn}&${key_checkout}=${post.checkout}&${key_pax}=${post.pax}&${key_client_nationality}=${post.client_nationality}&${key_currency}=${post.currency}&${key_destination_code}=${post.destination_code}`;
+        URL = `${appconstant.ApiBaseURL}${appconstant.Api_URL_Search}${appconstant.key_checkin}=${post.checkIn}&${appconstant.key_checkout}=${post.checkout}&${appconstant.key_pax}=${post.pax}&${appconstant.key_client_nationality}=${post.client_nationality}&${appconstant.key_currency}=${post.currency}&${appconstant.key_destination_code}=${post.destination_code}`;
     }
     else{
-        URL = `${appconstant.ApiBaseURL}${appconstant.Api_URL_Search}${key_checkin}=${post.checkIn}&${key_checkout}=${post.checkout}&${key_pax}=${post.pax}&${key_client_nationality}=${post.client_nationality}&${key_currency}=${post.currency}&${key_lat}=${post.lat}&${key_lon}=${post.lon}&${key_radius}=${post.radius}`;
+        URL = `${appconstant.ApiBaseURL}${appconstant.Api_URL_Search}${appconstant.key_checkin}=${post.checkIn}&${appconstant.key_checkout}=${post.checkout}&${appconstant.key_pax}=${post.pax}&${appconstant.key_client_nationality}=${post.client_nationality}&${appconstant.key_currency}=${post.currency}&${appconstant.key_lat}=${post.lat}&${appconstant.key_lon}=${post.lon}&${appconstant.key_radius}=${post.radius}`;
     }
 
     result_search = await searchHotelData(URL,post.header);
@@ -100,7 +89,7 @@ exports.getHotelsData = async function(ctx){
     }
 
     //////////  Availibility ////////////////
-    URL = `${appconstant.ApiBaseURL}${appconstant.Api_URL_Availability}${appconstant.Api_URL_Availability_searchcode}=${result_search.code}&${key_hotel_code}=${result_search.results[0].hotel_code}&${appconstant.Api_URL_Availability_Max_product}`
+    URL = `${appconstant.ApiBaseURL}${appconstant.Api_URL_Availability}${appconstant.Api_URL_Availability_searchcode}=${result_search.code}&${appconstant.key_hotel_code}=${result_search.results[0].hotel_code}&${appconstant.Api_URL_Availability_Max_product}`
     result_availibility_search = await availabelHotel(URL,post.header);
 
     if(!result_availibility_search){
@@ -132,10 +121,7 @@ exports.getHotelsData = async function(ctx){
     
     //////////  Booking Listing ////////////////
 
-    const key_from_date = Object.keys(post).find(k=>post[k]===post.from_date);
-    const key_to_date = Object.keys(post).find(k=>post[k]===post.to_date);
-
-    URL = `${appconstant.ApiBaseURL}${appconstant.Api_URL_Bookings}&${key_from_date}=${post.from_date}&${key_to_date}=${post.to_date}`;
+    URL = `${appconstant.ApiBaseURL}${appconstant.Api_URL_Bookings}&${appconstant.key_from_date}=${post.from_date}&${appconstant.key_to_date}=${post.to_date}`;
     result_Bookings = await getBookings(URL, post.header)
 
     SuccessResult(ctx,appconstant.Success_Data ,200,result_Bookings)
@@ -157,34 +143,38 @@ exports.getHotelListings = async function(ctx){
     var fromDate = ctx.request.query.from_date;
     var toDate = ctx.request.query.to_date;
 
+    var time1 = moment(fromDate).format('YYYY-MM-DD');
+    var time2 = moment(toDate).format('YYYY-MM-DD');
+    
+    if(time2 < time1){
+        ctx.throw(400, 'to_date can not less then from_date');
+    }
+
     var result_Listing = await getBookingListing(fromDate, toDate);
+  
     if(!result_Listing || !result_Listing.length){
         SuccessResult(ctx, appconstant.Success_Fail, 200,result_Listing);
     }else{
         SuccessResult(ctx, appconstant.Success_Data , 200,result_Listing);
-    }
-        
-    
+    }  
 }
 
 var getBookingListing = async function(fromDate, toDate){
     
     var URL;
-    var key_from_date = 'from_date';
-    var key_to_date = 'to_date';
     if(fromDate && toDate){
-        URL = `${appconstant.ApiBaseURL}${appconstant.Api_URL_Bookings}&${key_from_date}=${fromDate}&${key_to_date}=${toDate}`;
+        URL = `${appconstant.ApiBaseURL}${appconstant.Api_URL_Bookings}&${appconstant.key_from_date}=${fromDate}&${appconstant.key_to_date}=${toDate}`;
     }
     else if(fromDate && !toDate){
-        URL = `${appconstant.ApiBaseURL}${appconstant.Api_URL_Bookings}&${key_from_date}=${fromDate}`;
+        URL = `${appconstant.ApiBaseURL}${appconstant.Api_URL_Bookings}&${appconstant.key_from_date}=${fromDate}`;
     }
     else if(!fromDate && toDate){
-        URL = `${appconstant.ApiBaseURL}${appconstant.Api_URL_Bookings}&${key_to_date}=${toDate}`;
+        URL = `${appconstant.ApiBaseURL}${appconstant.Api_URL_Bookings}&${appconstant.key_to_date}=${toDate}`;
     }
     else{
         var today = new Date();
         var toDayDate = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
-        URL = `${appconstant.ApiBaseURL}${appconstant.Api_URL_Bookings}&${key_from_date}=${toDayDate}`;
+        URL = `${appconstant.ApiBaseURL}${appconstant.Api_URL_Bookings}&${appconstant.key_from_date}=${toDayDate}`;
     }
 
     var authorization = appconstant.HotelPro;
